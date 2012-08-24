@@ -17,6 +17,7 @@ def read(host):
         title = BeautifulSoup(context).title.string
     except HTMLParser.HTMLParseError:
         print "paser %s tile failure" %host
+        return
     print "%s  : %s" %(host,title)
     
 
