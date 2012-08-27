@@ -11,9 +11,8 @@ from BeautifulSoup import BeautifulSoup
 This script need stackless python 
 """
 
-hosts = ["http://yahoo.com", "http://google.com", "http://amazon.com",
-        "http://ibm.com", "http://apple.com","http://github.com"]
-
+hosts = ["http://www.yahoo.com", "http://www.baidu.com", "http://www.amazon.com",
+        "http://www.ibm.com", "http://www.python.org","http://www.microsoft.com"]
 def read(host):
     try:
         context = urllib2.urlopen(host,timeout=5)
@@ -29,7 +28,7 @@ def read(host):
     
 
 class Reader(object):
-    def __init__(self,host):
+    def __init__(self,channel):
         self.channel = channel
         stackless.tasklet(self.run)()
         
