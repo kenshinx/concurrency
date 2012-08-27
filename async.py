@@ -2,7 +2,6 @@
 
 import time
 import asyncore
-import stackless
 import urlparse
 import socket
 import StringIO
