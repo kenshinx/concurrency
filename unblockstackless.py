@@ -19,10 +19,10 @@ class AsyncRead(asyncore.dispatcher):
     def __init__(self,url):
         asyncore.dispatcher.__init__(self)
         self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sent = False
         self.out = StringIO.StringIO()
         self.url = url
         self.host = urlparse.urlparse(self.url).netloc
+        self.write_buffer = 'GET %s HTTP/1.0\r\n\r\n' % self.url
         self.connect((self.host,80))
         
     
@@ -30,12 +30,11 @@ class AsyncRead(asyncore.dispatcher):
         pass
     
     def writable(self):
-        return not self.sent
+        return len(self.write_buffer)
     
     def handle_write(self):
-        request =  'GET %s HTTP/1.0\r\n\r\n' % self.url
-        self.send(request)
-        self.sent = True
+        sent = self.send(self.write_buffer)
+        self.write_buffer = self.write_buffer[sent:]
     
     def handle_read(self):
         context =  self.recv(1024)
