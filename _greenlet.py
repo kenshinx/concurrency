@@ -44,7 +44,9 @@ class GreenReader(object):
         self.socket.settimeout(5)
         self.socket.setblocking(0)
         try:
-            self.socket.connect(self.address)
+            
+            err = self.socket.connect_ex(self.address)
+            print err
         except socket.error,why:
             sys.stderr.write("CONNECT ERROR:%s\n" %why[0])
             print why   
