@@ -8,7 +8,8 @@ from BeautifulSoup import BeautifulSoup
 
 
 """
-This script need stackless python 
+This is a negative concurrence example. 
+run need stackless python.
 """
 
 hosts = ["http://www.yahoo.com", "http://www.baidu.com", "http://www.amazon.com",
