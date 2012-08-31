@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
+import sys
 import time
 import socket
-import sys
+import errno
 import urlparse
 import StringIO
 import HTMLParser
@@ -11,8 +12,8 @@ from greenlet import greenlet
 from greenlet import getcurrent
 
 
-hosts = ["http://www.yahoo.com", "http://www.baidu.com", "http://www.amazon.com",
-        "http://www.ibm.com", "http://www.python.org","http://www.microsoft.com"]
+hosts = ["http://www.baidu.com", "http://www.amazon.com","http://www.ibm.com",
+         "http://www.python.org","http://www.microsoft.com"]
 
 
 class Listener(object):
@@ -37,33 +38,31 @@ class GreenReader(object):
         self.address = (host,80)
         self._connect()
         self.terminate = False
-        self.write_buffer = 'GET %s HTTP/1.0\r\n\r\n' % url
+        self.send_buffer = 'GET %s HTTP/1.0\r\n\r\n' % url
         self.out = StringIO.StringIO()
     
     def _connect(self):
-        self.socket.settimeout(5)
-        self.socket.setblocking(0)
         try:
             
-            err = self.socket.connect_ex(self.address)
-            print err
+            self.socket.connect(self.address)
         except socket.error,why:
             sys.stderr.write("CONNECT ERROR:%s\n" %why[0])
-            print why   
+        self.socket.setblocking(0)
         Listener.register(self)
     
     @property       
-    def readable(self):
+    def recvable(self):
         return True
         
-    def read(self):
+    def recv(self):
         try:
             data = self.socket.recv(128)
-        except socket.error as e:
-            sys.stderr.write("RECEIVE ERROR:%s\n" %e[0])
-            data = e
+        except socket.error , why:
+            data = why
         if isinstance(data,Exception):
-            self.stop()
+            if why[0] not in [errno.WSAEWOULDBLOCK,errno.EAGAIN]:
+                self.stop()
+                sys.stderr.write("RECEIVE ERROR:%s\n" %why[0])
         elif data:
             self.out.write(data)
         else:
@@ -71,16 +70,23 @@ class GreenReader(object):
         
     
     @property
-    def writeable(self):
-        return len(self.write_buffer)
+    def sendable(self):
+        return len(self.send_buffer)
 
-    def write(self):
-        print self.write_buffer
-        sent = self.socket.send(self.write_buffer)
-        self.write_buffer = self.write_buffer[sent:]
+    def send(self):
+        try:
+            sent = self.socket.send(self.send_buffer)
+            self.send_buffer = self.send_buffer[sent:]
+        except socket.error,why:
+            if why[0] == errno.WSAEWOULDBLOCK:
+                pass
+            else:
+                sys.stderr.write("SEND ERROR:%s\n" %why[0])
+                self.stop()
     
     def __loop__(self):
         pass
+    
 
     def stop(self):
         self.terminate = True
@@ -93,18 +99,23 @@ class GreenReader(object):
         except socket.error,why:
             sys.stderr.write("CLOSE ERROR:%s\n" %why[0])
 
+    def __repr__(self):
+        return "Reading %s" %self.url
+
 def mainloop():
     while Listener._greenreaders:
         for gr in Listener._greenreaders:
-            if gr.writeable:gr.write()
-            if gr.readable:gr.read()
-            time.sleep(0.01)
+            if gr.sendable:gr.send()
+            if gr.recvable:gr.recv()
+        print [Listener._greenreaders]
+        time.sleep(0.01)
 
 
 def concuryRead():
     start = time.time()
     grs = [GreenReader(host) for host in hosts]
     mainloop()
+    print "xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     for gr in grs:
         context =  gr.out.getvalue()
         title = BeautifulSoup(context).title.string
