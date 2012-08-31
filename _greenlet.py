@@ -36,14 +36,14 @@ class GreenReader(object):
         self.url = url
         host = urlparse.urlparse(url).netloc
         self.address = (host,80)
-        self._connect()
+        self.connect()
         self.terminate = False
         self.send_buffer = 'GET %s HTTP/1.0\r\n\r\n' % url
         self.out = StringIO.StringIO()
+        self._greenloop = greenlet(self._loop)
     
-    def _connect(self):
+    def connect(self):
         try:
-            
             self.socket.connect(self.address)
         except socket.error,why:
             sys.stderr.write("CONNECT ERROR:%s\n" %why[0])
@@ -84,14 +84,19 @@ class GreenReader(object):
                 sys.stderr.write("SEND ERROR:%s\n" %why[0])
                 self.stop()
     
-    def __loop__(self):
-        pass
+    def _loop(self):
+        pg = getcurrent().parent
+        while not self.terminate:
+            if self.sendable:self.send()
+            if self.recvable:self.recv()
+            pg.switch()
     
 
     def stop(self):
         self.terminate = True
         Listener.unregister(self)
         self._close()
+        
     
     def _close(self):
         try:
@@ -105,22 +110,17 @@ class GreenReader(object):
 def mainloop():
     while Listener._greenreaders:
         for gr in Listener._greenreaders:
-            if gr.sendable:gr.send()
-            if gr.recvable:gr.recv()
-        print [Listener._greenreaders]
-        time.sleep(0.01)
+            gr._greenloop.switch()
 
 
 def concuryRead():
     start = time.time()
     grs = [GreenReader(host) for host in hosts]
     mainloop()
-    print "xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     for gr in grs:
         context =  gr.out.getvalue()
         title = BeautifulSoup(context).title.string
         print "%s  : %s" %(gr.url,title)
-        
     end = time.time()
     print "Elapsed Time : %d" %(end-start)
 
