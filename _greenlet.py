@@ -3,13 +3,22 @@
 import sys
 import time
 import socket
-import errno
 import urlparse
 import StringIO
 import HTMLParser
 from BeautifulSoup import BeautifulSoup
 from greenlet import greenlet
 from greenlet import getcurrent
+
+is_windows = sys.platform == 'win32'
+
+if is_windows:
+    from errno import WSAEWOULDBLOCK as EWOULDBLOCK
+    EAGAIN = EWOULDBLOCK
+else:
+    from errno import EWOULDBLOCK
+    from errno import EAGAIN
+
 
 
 hosts = ["http://www.baidu.com", "http://www.amazon.com","http://www.ibm.com",
@@ -60,7 +69,7 @@ class GreenReader(object):
         except socket.error , why:
             data = why
         if isinstance(data,Exception):
-            if why[0] not in [errno.WSAEWOULDBLOCK,errno.EAGAIN]:
+            if why[0] not in [EWOULDBLOCK,EAGAIN]:
                 self.stop()
                 sys.stderr.write("RECEIVE ERROR:%s\n" %why[0])
         elif data:
@@ -78,7 +87,7 @@ class GreenReader(object):
             sent = self.socket.send(self.send_buffer)
             self.send_buffer = self.send_buffer[sent:]
         except socket.error,why:
-            if why[0] == errno.WSAEWOULDBLOCK:
+            if why[0] == EWOULDBLOCK:
                 pass
             else:
                 sys.stderr.write("SEND ERROR:%s\n" %why[0])
