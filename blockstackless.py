@@ -12,8 +12,9 @@ This is a negative concurrence example.
 run need stackless python.
 """
 
-hosts = ["http://www.yahoo.com", "http://www.baidu.com", "http://www.amazon.com",
-        "http://www.ibm.com", "http://www.python.org","http://www.microsoft.com"]
+hosts = ["http://www.baidu.com", "http://www.amazon.com","http://www.ibm.com",
+         "http://www.python.org","http://www.microsoft.com"]
+
 def read(host):
     try:
         context = urllib2.urlopen(host,timeout=5)

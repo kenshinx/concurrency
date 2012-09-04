@@ -4,8 +4,8 @@ import urllib2
 import HTMLParser
 from BeautifulSoup import BeautifulSoup
 
-hosts = ["http://www.yahoo.com", "http://www.baidu.com", "http://www.amazon.com",
-        "http://www.ibm.com", "http://www.python.org","http://www.microsoft.com"]
+hosts = ["http://www.baidu.com", "http://www.amazon.com","http://www.ibm.com",
+         "http://www.python.org","http://www.microsoft.com"]
 
 def read(host):
     try:
