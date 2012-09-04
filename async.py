@@ -43,11 +43,17 @@ class AsyncRead(asyncore.dispatcher):
 
 def unblockRead():
     start = time.time()
-    readers = [AsyncRead(host) for host in hosts]
+    readers = []
+    for i in range(30):
+        for host in hosts:
+            readers.append(AsyncRead(host))
     asyncore.loop(timeout=5)
     for reader in readers:
         context =  reader.out.getvalue()
-        title = BeautifulSoup(context).title.string
+        try:
+            title = BeautifulSoup(context).title.string
+        except HTMLParser.HTMLParseError:
+            print "paser %s tile failure" %host
         print "%s  : %s" %(reader.url,title)
         
     end = time.time()

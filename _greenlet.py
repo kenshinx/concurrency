@@ -153,7 +153,7 @@ def mainloop():
 def concuryRead():
     start = time.time()
     grs = []
-    for i in range(10):
+    for i in range(30):
         for host in hosts:
             grs.append(GreenReader(host))
     mainloop()

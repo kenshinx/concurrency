@@ -23,7 +23,9 @@ def read(host):
 
 def singleRead():
     start = time.time()
-    [read(host) for host in hosts]
+    for i in range(30):
+        for host in hosts:
+            read(host)
     end = time.time()
     print "Elapsed Time : %d" %(end-start)
     
