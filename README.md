@@ -1,6 +1,8 @@
 concurrency
 ===================
 
+The benchmark of different program version.
+
 singethread.py  :   252s
 
 multithread.py  :   17s
