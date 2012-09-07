@@ -1,16 +1,16 @@
 concurrency
 ===================
 
-singethread.py  :   252S
+singethread.py  :   252s
 
-multithread.py  :   17S
+multithread.py  :   17s
 
-multiprocess.py :
+multiprocess.py :   40s
 
-blockstackless.py   :   240S
+blockstackless.py   :   240s
 
-async.py    :   13S
+async.py    :   13s
 
-_greenlet.py    :   6S
+_greenlet.py    :   6s
 
-_gevent.py  :   6S
+_gevent.py  :   6s
