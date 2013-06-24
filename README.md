@@ -24,12 +24,12 @@ _greenlet.py    :   6s
 
 _gevent.py  :   6s
 
-#Supplement go-goroutine implement. 
+*Supplement go-goroutine implement.*
 
 goroutine.go : 4.6s
 
 
-Note: The bechmark result is just for learning. Nerver consider it in your production.
+[!!] Note: The bechmark result is just for learning. Nerver consider it in your production.
 
 
 
