@@ -1,11 +1,12 @@
 concurrency
 ===================
 
-Concurrency http request client .implement by different python library.
+Through different Python implement .Try to understand the difference between the follow concurrency types..
 
 include:
 
-`multi-thread`,`multiprocess`,`stackless`,`async`,`greent`,`gevent`
+* Blocking IO: `singlethread`, `multi-thred`, `multi-process`
+* Unblock IO: `greelet`, `gevent`, `async`, `goroutine`
 
 
 The benchmark of different program version.
